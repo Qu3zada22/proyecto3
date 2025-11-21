@@ -1,4 +1,5 @@
 // main.rs
+
 mod framebuffer;
 mod triangle;
 mod obj;
@@ -115,11 +116,9 @@ fn render(
 
 // 🌟 Renderiza estrellas en el fondo (skybox simple)
 fn render_skybox(framebuffer: &mut Framebuffer, view_matrix: &Matrix, projection_matrix: &Matrix, viewport_matrix: &Matrix, time: f32) {
-    // Reducido a 200 estrellas para aligerar carga y reducir posibilidad de saturar fragment buffer
     let mut rng = fastrand::Rng::with_seed(time as u64);
-    for _ in 0..200 {
-        // Distribución esférica uniforme con radio grande
-        let radius = 200.0_f32;
+    for i in 0..300 { // ↑ Subimos a 300 para más riqueza (sigue siendo liviano)
+        let radius = 300.0_f32;
         let u = rng.f32();
         let v = rng.f32();
         let theta = 2.0_f32 * PI * u;
@@ -128,7 +127,6 @@ fn render_skybox(framebuffer: &mut Framebuffer, view_matrix: &Matrix, projection
         let y = radius * phi.cos();
         let z = radius * phi.sin() * theta.sin();
 
-        // Proyectar punto 3D → pantalla
         let pos4 = Vector4::new(x, y, z, 1.0_f32);
         let view_pos = multiply_matrix_vector4(view_matrix, &pos4);
         let clip_pos = multiply_matrix_vector4(projection_matrix, &view_pos);
@@ -138,17 +136,24 @@ fn render_skybox(framebuffer: &mut Framebuffer, view_matrix: &Matrix, projection
             clip_pos.y / clip_pos.w,
             clip_pos.z / clip_pos.w,
         );
-        let ndc4 = Vector4::new(ndc.x, ndc.y, ndc.z, 1.0_f32);
-        let screen_pos = multiply_matrix_vector4(viewport_matrix, &ndc4);
+        let ndc_vec4 = Vector4::new(ndc.x, ndc.y, ndc.z, 1.0_f32);
+        let screen_pos = multiply_matrix_vector4(viewport_matrix, &ndc_vec4);
         let sx = screen_pos.x as i32;
         let sy = screen_pos.y as i32;
 
-        // Dibujar punto si está en pantalla
         if sx >= 0 && sx < framebuffer.width && sy >= 0 && sy < framebuffer.height {
-            // Brillo variable: algunas estrellas más brillantes
+            // 🌟 Variedad de colores: 70% blanco, 20% azul, 10% amarillo
+            let star_type = i % 10; // simple, determinista por índice (evita RNG extra)
+            let (r, g, b) = if star_type < 7 {
+                (1.0, 1.0, 1.0) // blanca
+            } else if star_type < 9 {
+                (0.6, 0.8, 1.0) // azulada (estrellas calientes)
+            } else {
+                (1.0, 0.9, 0.7) // amarillenta (como el Sol, pero pequeñas)
+            };
             let brightness = 0.8_f32 + rng.f32() * 0.4_f32;
-            let star_color = Vector3::new(brightness, brightness, brightness);
-            framebuffer.point(sx, sy, star_color, clip_pos.z / clip_pos.w); // profundidad grande
+            let star_color = Vector3::new(r * brightness, g * brightness, b * brightness);
+            framebuffer.point(sx, sy, star_color, clip_pos.z / clip_pos.w);
         }
     }
 }
@@ -335,7 +340,8 @@ fn main() {
         }
     };
 
-    framebuffer.set_background_color(Color::new(25, 25, 75, 255));
+
+    framebuffer.set_background_color(Color::new(0, 0, 0, 255)); 
 
     let sun = CelestialBody {
         name: "Sun".to_string(),
