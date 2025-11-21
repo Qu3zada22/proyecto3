@@ -1,0 +1,13 @@
+[package]
+name = "solar-sim"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+raylib = "5.5.1"
+tobj = "4.0.3"
+fastrand = "2.1"  # para el skybox (opcional, pero necesario si usas las estrellas)
+
+[profile.dev]
+opt-level = 3
+debug = false
