@@ -40,10 +40,6 @@ https://youtu.be/Ane6mZlRVgc
 - Nave espacial siguiendo la cámara.
 - Movimiento libre en 3D.
 
->  **Nota**: Sube tu video a YouTube o Vimeo, copia el enlace y reemplaza `https://youtu.be/tu_video_aqui` arriba.  
-> Si prefieres alojarlo localmente, sube el archivo `demo.mp4` al repo y escribe:  
-> `[Ver video local](demo.mp4)`
-
 ---
 
 ## Cómo ejecutarlo
